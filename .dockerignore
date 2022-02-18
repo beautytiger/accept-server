@@ -1,2 +1,4 @@
 __pycache__
 venv/
+deploy/
+accept-server

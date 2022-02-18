@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: accept-server
+  labels:
+    app: accept-server
+spec:
+  selector:
+    matchLabels:
+      app: accept-server
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: accept-server
+    spec:
+      containers:
+      - name: accept-server
+        image: harbor.beautytiger.home/myapplication/accept-server
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+          name: http
+        resources:
+          limits:
+            cpu: "1"
+            memory: 1Gi
+          requests:
+            cpu: 10m
+            memory: 10Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: accept-server
+  name: accept-server
+spec:
+  ports:
+  - name: http
+    port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: accept-server
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: accept-server
+  labels:
+    app: accept-server
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: accept-server.apps.beautytiger.home
+    http:
+      paths:
+      - backend:
+          service:
+            name: accept-server
+            port:
+              name: http
+        path: /
+        pathType: Prefix
